@@ -6,13 +6,12 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
-  align-content: center;
 }
 
 .fullpage {
   height: 100vh;
   width: 100vw;
-  background-image: url("/image/login_background.png");
+  background-image: url("/image/login_background.png"); /* change image path if needed */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -20,7 +19,6 @@
   justify-content: center;
   align-items: center;
 }
-
 
 .title {
   font-size: 28px;
@@ -41,7 +39,7 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
-  transition: border-color 0.3s;
+  transition: border-color 0.3s ease;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -57,9 +55,23 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 }
 
 .button:hover {
   background-color: #005bb5;
+}
+
+.link {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #0070f3;
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: #005bb5;
+  text-decoration: underline;
 }
