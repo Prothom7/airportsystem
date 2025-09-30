@@ -15,7 +15,7 @@ export async function connect() {
         })
     }
     catch(error){
-        console.log('Something went wrong connection to Databse');
+        console.log('Something went wrong connection to Database');
         console.log(error);
     }
 }
