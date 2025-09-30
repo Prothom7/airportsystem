@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const baggageSchema = new mongoose.Schema({
     
     booking: {
@@ -8,7 +10,7 @@ const baggageSchema = new mongoose.Schema({
     weight: Number,
 
     dimensions: String,
-    
+
     isOverweight: {
         type: Boolean,
         default: false
