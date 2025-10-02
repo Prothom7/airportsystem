@@ -13,6 +13,8 @@ export default function NewFlightPage() {
   const [arrivalTime, setArrivalTime] = useState("");
   const [aircraft, setAircraft] = useState(""); // ObjectId string
   const [status, setStatus] = useState("Scheduled");
+  const [price, setPrice] = useState<number>(0);
+
 
   const router = useRouter();
 
@@ -28,6 +30,7 @@ export default function NewFlightPage() {
       arrivalTime,
       aircraft,
       status,
+      price,
     };
 
     const res = await fetch("/api/admin/flight", {
@@ -118,6 +121,15 @@ export default function NewFlightPage() {
             <option value="Departed">Departed</option>
             <option value="Arrived">Arrived</option>
           </select>
+
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+            placeholder="Ticket Price"
+            className={styles.input}
+            required
+          />
 
           <button type="submit" className={styles.button}>
             Submit
