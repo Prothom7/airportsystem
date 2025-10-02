@@ -13,8 +13,7 @@ export default function NewFlightPage() {
   const [arrivalTime, setArrivalTime] = useState("");
   const [aircraft, setAircraft] = useState(""); // ObjectId string
   const [status, setStatus] = useState("Scheduled");
-  const [price, setPrice] = useState<number>(0);
-
+  const [price, setPrice] = useState<number>();
 
   const router = useRouter();
 
@@ -76,15 +75,15 @@ export default function NewFlightPage() {
           />
           <input
             value={departureAirport}
-            onChange={(e) => setDepartureAirport(e.target.value.toUpperCase())}
-            placeholder="Departure Airport Code"
+            onChange={(e) => setDepartureAirport(e.target.value)}
+            placeholder="Departure Airport ID"
             className={styles.input}
             required
           />
           <input
             value={arrivalAirport}
-            onChange={(e) => setArrivalAirport(e.target.value.toUpperCase())}
-            placeholder="Arrival Airport Code"
+            onChange={(e) => setArrivalAirport(e.target.value)}
+            placeholder="Arrival Airport ID"
             className={styles.input}
             required
           />

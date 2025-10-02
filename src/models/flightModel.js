@@ -16,13 +16,14 @@ const flightSchema = new mongoose.Schema({
         ref: "airlines",
         required: true
     },
-
     departureAirport: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "airports",
         required: true
     },
     arrivalAirport: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "airports",
         required: true
     },
     departureTime: {
