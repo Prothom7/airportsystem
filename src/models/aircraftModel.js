@@ -19,7 +19,8 @@ const aircraftSchema = new mongoose.Schema({
         required: true
     },
     airline: {
-        type: String, // or a reference if you have an Airline model
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "airlines",
         required: true
     },
     inService: {
