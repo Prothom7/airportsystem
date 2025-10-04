@@ -3,9 +3,11 @@ import { redirect } from 'next/navigation';
 import { getDataFromToken } from '@/helpers/getDataFromToken';
 import { connect } from '@/dbConnection/dbConnection';
 import User from '@/models/userModel';
+import { getAllFlights, FlightType } from '@/services/flightService';
 import DashboardClient from './dashboardClient';
 
 interface IUser {
+  _id: string;
   username: string;
   isAdmin: boolean;
 }
@@ -13,38 +15,22 @@ interface IUser {
 export default async function DashboardPage() {
   await connect();
 
-  try {
-    const cookieStore = cookies(); // ✅ this is NOT async
-    const tokenCookie = (await cookieStore).get('token'); // ✅ .get() should work here
+  const tokenCookie = (await cookies()).get('token');
+  if (!tokenCookie) redirect('/login');
 
-    if (!tokenCookie) {
-      redirect('/login');
-    }
+  const fakeRequest = {
+    cookies: {
+      get: (name: string) => (name === 'token' ? { value: tokenCookie.value } : undefined),
+    },
+  } as any;
 
-    const fakeRequest = {
-      cookies: {
-        get: (name: string) => {
-          if (name === 'token') {
-            return { value: tokenCookie.value };
-          }
-          return undefined;
-        },
-      },
-    } as any;
+  const userId = getDataFromToken(fakeRequest);
+  if (!userId) redirect('/login');
 
-    const userId = getDataFromToken(fakeRequest);
-    if (!userId) {
-      redirect('/login');
-    }
+  const user = await User.findById(userId).lean<IUser>();
+  if (!user?.isAdmin) redirect('/login');
 
-    const user = await User.findById(userId).lean<IUser>();
-    if (!user || !user.isAdmin) {
-      redirect('/login');
-    }
+  const flights: FlightType[] = await getAllFlights();
 
-    return <DashboardClient userName={user.username} />;
-  } catch (error) {
-    console.error('Auth error:', error);
-    redirect('/login');
-  }
+  return <DashboardClient userName={user.username} flights={flights} />;
 }

@@ -1,10 +1,21 @@
 .fullpage {
-  height: 100vh;
-  width: 100vw;
-  background-color: #F0F0F0;
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  width: 100%;
+  background-image: url("/image/admin_background.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
+  color: #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .navbar {
@@ -12,40 +23,159 @@
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #7C2A3D;
+  background: rgba(255, 255, 255, 0.85);
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  padding: 15px 0;
-  box-shadow: 0 2px 6px rgba(124, 42, 61, 0.7);
-  z-index: 100;
+  gap: 24px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  font-weight: 600;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
 .navItem {
-  color: #F0F0F0;
-  font-weight: 600;
-  font-size: 16px;
-  margin: 0 18px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  text-decoration: none;
+  color: #222;
   cursor: pointer;
-  transition: background-color 0.25s ease;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  user-select: none;
+  white-space: nowrap;
 }
 
 .navItem:hover {
-  background-color: #4C1E27;
+  background-color: rgba(34, 34, 34, 0.1);
 }
 
 .container {
-  max-width: 900px;
-  margin: 100px auto 0;
-  padding: 20px;
-  text-align: center;
+  width: 100%;
+  max-width: 1100px;
+  margin: 120px 20px 40px;
+  padding: 24px 32px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   color: #222;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.welcomeSection {
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
 .title {
-  font-size: 32px;
   font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 16px;
+  color: #111;
+  letter-spacing: 0.02em;
+}
+
+.tableSection {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 700px; /* prevent table from collapsing too small */
+  border-collapse: collapse;
+  margin-top: 0;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.table thead {
+  background-color: #f0f0f0;
+}
+
+.table th,
+.table td {
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #eaeaea;
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f9fafb;
+  cursor: default;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    margin: 100px 16px 32px;
+    padding: 20px 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin: 80px 12px 24px;
+    padding: 16px 16px;
+  }
+
+  .navbar {
+    gap: 12px;
+    font-size: 0.9rem;
+    padding: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .navItem {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .table {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .navItem {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+  }
 }
