@@ -26,7 +26,13 @@ const aircraftSchema = new mongoose.Schema({
     inService: {
         type: Boolean,
         default: true
-    }
+    },
+    seats: [
+        {
+            seatNumber: String,
+            class: { type: String, enum: ["Economy", "Business", "First"] }
+        }
+    ]
 });
 
 const Aircraft = mongoose.models.aircrafts || mongoose.model("aircrafts", aircraftSchema);
