@@ -43,7 +43,6 @@ export default function FlightSearchPage() {
       const res = await fetch(`/api/flights/search?${params.toString()}`);
       const data: Flight[] = await res.json();
 
-      // Client-side filtering by date (if backend doesn't filter)
       let filtered = data;
       if (departureDate) {
         filtered = data.filter((flight) => {
@@ -62,7 +61,7 @@ export default function FlightSearchPage() {
 
   const handleBookNow = (flight: Flight) => {
     localStorage.setItem('selectedFlight', JSON.stringify(flight));
-    router.push('/booking');
+    router.push('/flights/booking');
   };
 
   return (
