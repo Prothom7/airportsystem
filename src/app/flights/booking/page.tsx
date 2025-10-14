@@ -28,118 +28,277 @@ interface Flight {
   };
 }
 
+interface BookingStatus {
+  seatNumber: string;
+  paymentStatus: 'Pending' | 'Paid' | 'Refunded';
+}
+
 export default function BookingPage() {
   const [flightId, setFlightId] = useState<string | null>(null);
   const [flight, setFlight] = useState<Flight | null>(null);
+  const [bookings, setBookings] = useState<BookingStatus[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Load flightId from localStorage
   useEffect(() => {
-    const savedFlight = localStorage.getItem('selectedFlight');
-    if (savedFlight) {
-      const parsedFlight = JSON.parse(savedFlight);
-      setFlightId(parsedFlight._id);
+    const saved = localStorage.getItem('selectedFlight');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed._id) {
+          setFlightId(parsed._id);
+        } else {
+          console.error('selectedFlight missing _id field:', parsed);
+          setError('Invalid flight data stored.');
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Failed to parse selectedFlight from localStorage:', err);
+        setError('Invalid flight data in storage.');
+        setLoading(false);
+      }
     } else {
-      setError('No flight selected. Please go back and choose a flight.');
+      setError('No flight selected. Please choose a flight first.');
       setLoading(false);
     }
   }, []);
 
+  console.log('Using flightId:', flightId); // Add this just before fetchBookings
+
+
+  // Fetch flight details
   useEffect(() => {
     if (!flightId) return;
 
-    async function fetchFlight() {
+    const fetchFlight = async () => {
       setLoading(true);
       try {
         const res = await fetch(`/api/flights/${flightId}`);
-        if (!res.ok) throw new Error('Failed to fetch flight');
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to fetch flight');
+        }
         const data: Flight = await res.json();
         setFlight(data);
       } catch (err) {
-        setError('Failed to load flight data.');
-        console.error(err);
+        console.error('Error fetching flight:', err);
+        setError('Unable to load flight details.');
       } finally {
         setLoading(false);
       }
-    }
+    };
+
     fetchFlight();
   }, [flightId]);
 
-  const seatsByRow = flight?.aircraft?.seats?.reduce<Record<string, Seat[]>>((acc, seat) => {
-    const row = seat.seatNumber.match(/\d+/)?.[0] || 'Unknown';
+  // Fetch bookings / reserved seats
+  useEffect(() => {
+    if (!flightId) return;
+
+    const fetchBookings = async () => {
+      try {
+        const res = await fetch(`/api/bookings?flightId=${flightId}`);
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to fetch bookings');
+        }
+        const data: BookingStatus[] = await res.json();
+        setBookings(data);
+      } catch (err) {
+        console.error('Error fetching bookings:', err);
+        setError('Could not load booking data.');
+      }
+    };
+
+    fetchBookings();
+  }, [flightId]);
+
+  // Group seats by row number
+  const seatsByRow: Record<string, Seat[]> = flight?.aircraft?.seats?.reduce((acc, seat) => {
+    const match = seat.seatNumber.match(/\d+/);
+    const row = match ? match[0] : '0';
     if (!acc[row]) acc[row] = [];
     acc[row].push(seat);
     return acc;
-  }, {}) || {};
+  }, {} as Record<string, Seat[]>) || {};
 
-  const toggleSeatSelection = (seatNumber: string) => {
-    setSelectedSeats((prev) =>
-      prev.includes(seatNumber)
-        ? prev.filter((s) => s !== seatNumber)
-        : [...prev, seatNumber]
-    );
+  // Return the booking status (if any) of a seat
+  const getSeatBookingStatus = (seatNumber: string): BookingStatus['paymentStatus'] | null => {
+    const booking = bookings.find(b => b.seatNumber === seatNumber);
+    return booking ? booking.paymentStatus : null;
   };
 
-  if (loading) return <p>Loading flight data...</p>;
-  if (error) return <p>{error}</p>;
-  if (!flight) return null;
+  // Toggle selection (unless already reserved)
+  const toggleSeatSelection = (seatNumber: string) => {
+    const status = getSeatBookingStatus(seatNumber);
+    if (status === 'Pending' || status === 'Paid') {
+      return; // disallow selecting reserved seats
+    }
+    if (selectedSeats.includes(seatNumber)) {
+      setSelectedSeats(prev => prev.filter(s => s !== seatNumber));
+    } else {
+      if (selectedSeats.length < 4) {
+        setSelectedSeats(prev => [...prev, seatNumber]);
+      } else {
+        // optionally inform user they can't select more than 4
+      }
+    }
+  };
+
+  // Proceed to checkout
+  const handleCheckout = () => {
+    if (!flight) return;
+    const checkoutData = {
+      flightId: flight._id,
+      seats: selectedSeats,
+      totalPrice: flight.price * selectedSeats.length,
+    };
+    localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+    window.location.href = '/checkout';
+  };
+
+  if (loading) {
+    return <p className={styles.statusMessage}>Loading...</p>;
+  }
+  if (error) {
+    return <p className={styles.statusMessage}>{error}</p>;
+  }
+  if (!flight) {
+    return null;
+  }
+
+  const totalPrice = flight.price * selectedSeats.length;
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h1>Booking Flight: {flight.flightNumber}</h1>
-      <p><strong>Airline:</strong> {flight.airline.name}</p>
-      <p><strong>From:</strong> {flight.departureAirport.city} ({flight.departureAirport.name})</p>
-      <p><strong>To:</strong> {flight.arrivalAirport.city} ({flight.arrivalAirport.name})</p>
-      <p><strong>Departure:</strong> {new Date(flight.departureTime).toLocaleString()}</p>
-      <p><strong>Arrival:</strong> {new Date(flight.arrivalTime).toLocaleString()}</p>
-      <p><strong>Status:</strong> {flight.status}</p>
-      <p><strong>Price:</strong> ${flight.price.toFixed(2)}</p>
+    <div className={styles.fullpage}>
+      <div className={styles.pageContainer}>
+        <h1 className={styles.pageTitle}>Booking Flight: {flight.flightNumber}</h1>
 
-      <h2>Seat Selection</h2>
-      <div style={{ border: '1px solid #ccc', padding: '1rem', maxWidth: '600px' }}>
-        {Object.entries(seatsByRow)
-          .sort((a, b) => Number(a[0]) - Number(b[0]))
-          .map(([row, seats]) => (
-            <div key={row} className={styles.seatsRowContainer}>
-              <strong className={styles.rowLabel}>Row {row}</strong>
-              <div className={styles.seatsRow}>
-                {seats.map((seat) => {
-                  const selected = selectedSeats.includes(seat.seatNumber);
-                  let className = '';
+        <div className={styles.ticketContainer}>
+          <div className={styles.ticketRow}>
+            <span className={styles.ticketLabel}>Flight Number:</span>
+            <span className={styles.ticketValue}>{flight.flightNumber}</span>
+          </div>
+          <div className={styles.ticketRow}>
+            <span className={styles.ticketLabel}>Airline:</span>
+            <span className={styles.ticketValue}>{flight.airline.name}</span>
+          </div>
+          <div className={styles.ticketRow}>
+            <span className={styles.ticketLabel}>From:</span>
+            <span className={styles.ticketValue}>
+              {flight.departureAirport.city} ({flight.departureAirport.name})
+            </span>
+          </div>
+          <div className={styles.ticketRow}>
+            <span className={styles.ticketLabel}>To:</span>
+            <span className={styles.ticketValue}>
+              {flight.arrivalAirport.city} ({flight.arrivalAirport.name})
+            </span>
+          </div>
+          <div className={styles.ticketRow}>
+            <span className={styles.ticketLabel}>Departure:</span>
+            <span className={styles.ticketValue}>
+              {new Date(flight.departureTime).toLocaleString()}
+            </span>
+          </div>
+          <div className={styles.ticketRow}>
+            <span className={styles.ticketLabel}>Arrival:</span>
+            <span className={styles.ticketValue}>
+              {new Date(flight.arrivalTime).toLocaleString()}
+            </span>
+          </div>
+          <div className={styles.ticketRow}>
+            <span className={styles.ticketLabel}>Status:</span>
+            <span className={styles.ticketValue}>{flight.status}</span>
+          </div>
+          <div className={styles.ticketRow}>
+            <span className={styles.ticketLabel}>Price (per seat):</span>
+            <span className={styles.ticketValue}>${flight.price.toFixed(2)}</span>
+          </div>
+        </div>
 
-                  switch (seat.class) {
-                    case 'Economy':
-                      className = styles.economy;
-                      break;
-                    case 'Business':
-                      className = styles.business;
-                      break;
-                    case 'First':
-                      className = styles.first;
-                      break;
-                  }
+        <h2 className={styles.sectionTitle}>Seat Selection</h2>
+        <div className={styles.seatSelectionContainer}>
+          {Object.entries(seatsByRow)
+            .sort((a, b) => Number(a[0]) - Number(b[0]))
+            .map(([row, seats]) => (
+              <div key={row} className={styles.seatsRowContainer}>
+                <strong className={styles.rowLabel}>Row {row}</strong>
+                <div className={styles.seatsRow}>
+                  {seats.map(seat => {
+                    const selected = selectedSeats.includes(seat.seatNumber);
+                    const bookingStatus = getSeatBookingStatus(seat.seatNumber);
 
-                  return (
-                    <button
-                      key={seat.seatNumber}
-                      onClick={() => toggleSeatSelection(seat.seatNumber)}
-                      className={`${styles.seatButton} ${className} ${selected ? styles.selected : ''}`}
-                      aria-pressed={selected}
-                      title={`${seat.seatNumber} (${seat.class})`}
-                    >
-                      {seat.seatNumber}
-                      <small className={styles.seatClassLabel}>{seat.class}</small>
-                    </button>
-                  );
-                })}
+                    let className = '';
+                    switch (seat.class) {
+                      case 'Economy':
+                        className = styles.economy;
+                        break;
+                      case 'Business':
+                        className = styles.business;
+                        break;
+                      case 'First':
+                        className = styles.first;
+                        break;
+                    }
+
+                    let disabled = false;
+                    if (bookingStatus === 'Pending') {
+                      className = styles.pending;
+                      disabled = true;
+                    } else if (bookingStatus === 'Paid') {
+                      className = styles.paid;
+                      disabled = true;
+                    }
+
+                    return (
+                      <button
+                        key={seat.seatNumber}
+                        className={`${styles.seatButton} ${className} ${selected ? styles.selected : ''}`}
+                        onClick={() => toggleSeatSelection(seat.seatNumber)}
+                        type="button"
+                        aria-pressed={selected}
+                        aria-label={
+                          `Seat ${seat.seatNumber}, ${seat.class}` +
+                          (selected ? ', selected' : '') +
+                          (disabled ? ', reserved' : '')
+                        }
+                        disabled={disabled}
+                      >
+                        <span>{seat.seatNumber}</span>
+                        <span className={styles.seatClassLabel}>{seat.class}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
-      </div>
+            ))}
 
-      <div style={{ marginTop: '1rem' }}>
-        <p>Selected Seats: {selectedSeats.join(', ') || 'None'}</p>
+          {selectedSeats.length > 0 ? (
+            <>
+              <p className={styles.selectedSeatsInfo}>
+                Selected Seats: {selectedSeats.join(', ')}
+              </p>
+              <p className={styles.selectedSeatsInfo}>
+                Total Price: ${totalPrice.toFixed(2)}
+              </p>
+              <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                <button
+                  onClick={handleCheckout}
+                  disabled={selectedSeats.length === 0}
+                  className={styles.checkoutButton}
+                  aria-disabled={selectedSeats.length === 0}
+                >
+                  Checkout
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className={styles.selectedSeatsInfo}>No seats selected yet.</p>
+          )}
+        </div>
       </div>
     </div>
   );

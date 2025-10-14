@@ -50,9 +50,13 @@ export async function getAllFlights(): Promise<FlightType[]> {
     .populate('airline', 'name code country')
     .populate('departureAirport', 'name city country iataCode icaoCode timezone')
     .populate('arrivalAirport', 'name city country iataCode icaoCode timezone')
-    .lean<FlightType[]>();
+    .lean();
 
-  return flights;
+  // Map and type cast safely
+  return flights.map((flight: any) => ({
+    ...flight,
+    _id: flight._id.toString(), // Ensure _id is string
+  })) as FlightType[];
 }
 
 export async function searchFlights(query: {
@@ -66,9 +70,9 @@ export async function searchFlights(query: {
     .populate('airline', 'name code country')
     .populate('departureAirport', 'name city country iataCode icaoCode timezone')
     .populate('arrivalAirport', 'name city country iataCode icaoCode timezone')
-    .lean<FlightType[]>();
+    .lean();
 
-  const filtered = flights.filter((flight) => {
+  const filtered = flights.filter((flight: any) => {
     const airlineMatch = query.airline
       ? flight.airline?.name?.toLowerCase().includes(query.airline.toLowerCase())
       : true;
@@ -83,5 +87,8 @@ export async function searchFlights(query: {
     return airlineMatch && destinationMatch;
   });
 
-  return filtered;
+  return filtered.map((flight: any) => ({
+    ...flight,
+    _id: flight._id.toString(),
+  })) as FlightType[];
 }

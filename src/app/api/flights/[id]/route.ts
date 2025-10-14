@@ -1,4 +1,3 @@
-// /api/flights/[id].ts
 import { NextResponse } from 'next/server';
 import Flight from '@/models/flightModel';
 import { connect } from '@/dbConnection/dbConnection';
