@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Header from '@/components/header';
+import Footer from '@/components/footer';
+import styles from './checkout.module.css';
 
 interface CheckoutData {
   flightId: string;
@@ -21,7 +24,7 @@ interface Flight {
 }
 
 interface User {
-  name: string;
+  username: string;
   email: string;
 }
 
@@ -35,7 +38,6 @@ export default function CheckoutPage() {
 
   const router = useRouter();
 
-  // Load data from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('checkoutData');
     if (saved) {
@@ -46,28 +48,30 @@ export default function CheckoutPage() {
         setError('Invalid checkout data');
       }
     }
-
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        const parsed: User = JSON.parse(userData);
-        setUser(parsed);
-      } catch (err) {
-        console.error('Invalid user data in localStorage');
-      }
-    }
   }, []);
 
-  // Fetch flight details
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/users/aboutme', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to fetch user');
+        const data = await res.json();
+        setUser(data.data);
+      } catch (err) {
+        console.error('User fetch error:', err);
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   useEffect(() => {
     const fetchFlight = async () => {
       if (!checkoutData?.flightId) return;
-
       try {
         const res = await fetch(`/api/flights/${checkoutData.flightId}`);
-        if (!res.ok) {
-          throw new Error('Flight not found');
-        }
+        if (!res.ok) throw new Error('Flight not found');
         const data: Flight = await res.json();
         setFlight(data);
       } catch (err) {
@@ -101,63 +105,97 @@ export default function CheckoutPage() {
         return;
       }
 
-      const result = await res.json();
-      console.log('Booking result:', result);
-
       alert('Payment confirmed and ticket created!');
       localStorage.removeItem('checkoutData');
       router.push('/confirmation');
-
     } catch (err) {
       console.error('Booking failed:', err);
       alert('Booking failed');
     }
   };
 
-  if (loading) return <p>Loading checkout summary...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!checkoutData || !flight) return <p>Invalid data</p>;
+  if (loading) return <p className={styles.loading}>Loading checkout summary...</p>;
+  if (error) return <p className={styles.error}>Error: {error}</p>;
+  if (!checkoutData || !flight) return <p className={styles.error}>Invalid data</p>;
 
   return (
-    <div>
-      <h1>Flight Ticket Summary</h1>
+    <>
+      <Header />
 
-      <h2>Flight Information</h2>
-      <p><strong>Flight:</strong> {flight.flightNumber} ({flight.airline.name})</p>
-      <p><strong>From:</strong> {flight.departureAirport.city} ({flight.departureAirport.name})</p>
-      <p><strong>To:</strong> {flight.arrivalAirport.city} ({flight.arrivalAirport.name})</p>
-      <p><strong>Departure:</strong> {new Date(flight.departureTime).toLocaleString()}</p>
-      <p><strong>Arrival:</strong> {new Date(flight.arrivalTime).toLocaleString()}</p>
-      <p><strong>Status:</strong> {flight.status}</p>
+      <div className={styles.fullpage}>
+        <div className={styles.container}>
+          <h1>Flight Ticket Summary</h1>
 
-      <h2>Selected Seats</h2>
-      <ul>
-        {checkoutData.seats.map(seat => (
-          <li key={seat}>Seat: {seat}</li>
-        ))}
-      </ul>
-      <p><strong>Total Price:</strong> ${checkoutData.totalPrice.toFixed(2)}</p>
+          <div className={styles.section}>
+            <h2>Flight Information</h2>
+            <p>
+              <strong>Flight:</strong> {flight.flightNumber} ({flight.airline.name})
+            </p>
+            <p>
+              <strong>From:</strong> {flight.departureAirport.city} ({flight.departureAirport.name})
+            </p>
+            <p>
+              <strong>To:</strong> {flight.arrivalAirport.city} ({flight.arrivalAirport.name})
+            </p>
+            <p>
+              <strong>Departure:</strong> {new Date(flight.departureTime).toLocaleString()}
+            </p>
+            <p>
+              <strong>Arrival:</strong> {new Date(flight.arrivalTime).toLocaleString()}
+            </p>
+            <p>
+              <strong>Status:</strong> {flight.status}
+            </p>
+          </div>
 
-      <h2>User Information</h2>
-      {user ? (
-        <>
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-        </>
-      ) : (
-        <p>No user info available</p>
-      )}
+          <div className={styles.section}>
+            <h2>Selected Seats</h2>
+            <ul className={styles.seatsList}>
+              {checkoutData.seats.map((seat) => (
+                <li key={seat}>Seat: {seat}</li>
+              ))}
+            </ul>
+            <p className={styles.totalPrice}>
+              <strong>Total Price:</strong> ${checkoutData.totalPrice.toFixed(2)}
+            </p>
+          </div>
 
-      <h2>Payment Method</h2>
-      <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-        <option value="credit_card">Credit Card</option>
-        <option value="paypal">PayPal</option>
-        <option value="upi">UPI</option>
-      </select>
+          <div className={styles.section}>
+            <h2>User Information</h2>
+            {user ? (
+              <>
+                <p>
+                  <strong>Username:</strong> {user.username}
+                </p>
+                <p>
+                  <strong>Email:</strong> {user.email}
+                </p>
+              </>
+            ) : (
+              <p>Loading user info or user not authenticated.</p>
+            )}
+          </div>
 
-      <div style={{ marginTop: '1rem' }}>
-        <button onClick={handleConfirmPayment}>Confirm & Pay</button>
+          <div className={styles.section}>
+            <h2>Payment Method</h2>
+            <select
+              className={styles.selectPayment}
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <option value="credit_card">Credit Card</option>
+              <option value="paypal">PayPal</option>
+              <option value="upi">UPI</option>
+            </select>
+          </div>
+
+          <button className={styles.confirmBtn} onClick={handleConfirmPayment}>
+            Confirm &amp; Pay
+          </button>
+        </div>
       </div>
-    </div>
+
+      <Footer />
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Booking from "@/models/reservationModel";
 import { connect } from "@/dbConnection/dbConnection";
-import { getDataFromToken } from "@/lib/getDataFromToken";
+import { getDataFromToken } from "@/helpers/getDataFromToken";
 
 export async function POST(req: NextRequest) {
   try {
