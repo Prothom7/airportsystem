@@ -6,7 +6,6 @@ import mongoose from 'mongoose';
 export async function GET(req: Request) {
   try {
     console.log('API /api/bookings called');
-
     await connect();
     console.log('Database connected');
 
@@ -19,14 +18,16 @@ export async function GET(req: Request) {
     }
 
     if (!mongoose.Types.ObjectId.isValid(flightId)) {
-      console.log('Invalid flightId format');
+      console.log('Invalid flightId format:', flightId);
       return NextResponse.json({ error: 'Invalid flightId format' }, { status: 400 });
     }
 
     console.log('Fetching bookings for flightId:', flightId);
-    const bookings = await Booking.find({ flight: new mongoose.Types.ObjectId(flightId) })
-      .select('seatNumber paymentStatus')
+    const bookings = await Booking.find({ flight: flightId })  // you can pass the string, Mongoose should cast
+      .select('seatNumber paymentStatus status')
       .lean();
+
+    console.log('Bookings found:', bookings.length, bookings);
 
     return NextResponse.json(bookings);
   } catch (error) {
