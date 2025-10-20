@@ -38,6 +38,7 @@ export default function CheckoutPage() {
 
   const router = useRouter();
 
+  // Load checkout data from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('checkoutData');
     if (saved) {
@@ -46,10 +47,15 @@ export default function CheckoutPage() {
         setCheckoutData(parsed);
       } catch (err) {
         setError('Invalid checkout data');
+        setLoading(false);
       }
+    } else {
+      setError('No checkout data found');
+      setLoading(false);
     }
   }, []);
 
+  // Fetch user data
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -66,9 +72,14 @@ export default function CheckoutPage() {
     fetchUser();
   }, []);
 
+  // Fetch flight details once checkoutData is loaded
   useEffect(() => {
+    if (!checkoutData?.flightId) {
+      setLoading(false);
+      return;
+    }
+
     const fetchFlight = async () => {
-      if (!checkoutData?.flightId) return;
       try {
         const res = await fetch(`/api/flights/${checkoutData.flightId}`);
         if (!res.ok) throw new Error('Flight not found');
@@ -85,23 +96,38 @@ export default function CheckoutPage() {
     fetchFlight();
   }, [checkoutData]);
 
+  // Handle confirm and payment
   const handleConfirmPayment = async () => {
-    if (!checkoutData) return;
+    if (!checkoutData || !flight) return;
+
+    setLoading(true);
+    setError(null);
 
     try {
-      const res = await fetch('/checkout/api', {
+      const res = await fetch('/checkout', {  // Call the route as /checkout (not /checkout/api)
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           flightId: checkoutData.flightId,
           seats: checkoutData.seats,
           paymentStatus: 'Paid',
+          flightNumber: flight.flightNumber,
+          totalPrice: checkoutData.totalPrice,
+          paymentMethod, // sending payment method if needed in future
         }),
       });
 
+      // Check response status and parse JSON only if correct content-type
       if (!res.ok) {
-        const errData = await res.json();
-        alert('Failed to book seats: ' + errData.error);
+        let errMsg = 'Unknown error';
+        try {
+          const errorData = await res.json();
+          errMsg = errorData.error || errMsg;
+        } catch {
+          // fallback
+        }
+        alert('Failed to book seats: ' + errMsg);
+        setLoading(false);
         return;
       }
 
@@ -110,7 +136,8 @@ export default function CheckoutPage() {
       router.push('/confirmation');
     } catch (err) {
       console.error('Booking failed:', err);
-      alert('Booking failed');
+      alert('Booking failed. Please try again.');
+      setLoading(false);
     }
   };
 
@@ -182,6 +209,7 @@ export default function CheckoutPage() {
               className={styles.selectPayment}
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
+              disabled={loading}
             >
               <option value="credit_card">Credit Card</option>
               <option value="paypal">PayPal</option>
@@ -189,8 +217,13 @@ export default function CheckoutPage() {
             </select>
           </div>
 
-          <button className={styles.confirmBtn} onClick={handleConfirmPayment}>
-            Confirm &amp; Pay
+          <button
+            className={styles.confirmBtn}
+            onClick={handleConfirmPayment}
+            disabled={loading}
+            aria-disabled={loading}
+          >
+            {loading ? 'Processing...' : 'Confirm & Pay'}
           </button>
         </div>
       </div>
