@@ -31,5 +31,7 @@ const bookingSchema = new mongoose.Schema({
     }
 });
 
+bookingSchema.index({ flight: 1, seatNumber: 1 }, { unique: true });
+
 const Booking = mongoose.models.bookings || mongoose.model("bookings", bookingSchema);
 export default Booking;

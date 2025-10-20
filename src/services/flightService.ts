@@ -12,7 +12,7 @@ export interface FlightType {
     manufacturer: string;
     registrationNumber: string;
     capacity: number;
-    airline: string | object; 
+    airline: string | object;
     inService: boolean;
   };
   airline: {
@@ -50,8 +50,45 @@ export async function getAllFlights(): Promise<FlightType[]> {
     .populate('airline', 'name code country')
     .populate('departureAirport', 'name city country iataCode icaoCode timezone')
     .populate('arrivalAirport', 'name city country iataCode icaoCode timezone')
-    .lean<FlightType[]>();  
+    .lean();
 
-  return flights;
+  // Map and type cast safely
+  return flights.map((flight: any) => ({
+    ...flight,
+    _id: flight._id.toString(), // Ensure _id is string
+  })) as FlightType[];
 }
 
+export async function searchFlights(query: {
+  airline?: string;
+  destination?: string;
+}): Promise<FlightType[]> {
+  await connect();
+
+  const flights = await Flight.find()
+    .populate('aircraft', 'model manufacturer registrationNumber capacity airline inService')
+    .populate('airline', 'name code country')
+    .populate('departureAirport', 'name city country iataCode icaoCode timezone')
+    .populate('arrivalAirport', 'name city country iataCode icaoCode timezone')
+    .lean();
+
+  const filtered = flights.filter((flight: any) => {
+    const airlineMatch = query.airline
+      ? flight.airline?.name?.toLowerCase().includes(query.airline.toLowerCase())
+      : true;
+
+    const destinationMatch = query.destination
+      ? (
+          flight.arrivalAirport?.city?.toLowerCase().includes(query.destination.toLowerCase()) ||
+          flight.arrivalAirport?.name?.toLowerCase().includes(query.destination.toLowerCase())
+        )
+      : true;
+
+    return airlineMatch && destinationMatch;
+  });
+
+  return filtered.map((flight: any) => ({
+    ...flight,
+    _id: flight._id.toString(),
+  })) as FlightType[];
+}
