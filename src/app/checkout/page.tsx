@@ -38,73 +38,49 @@ export default function CheckoutPage() {
 
   const router = useRouter();
 
-  // Load checkout data from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('checkoutData');
-    if (saved) {
-      try {
-        const parsed: CheckoutData = JSON.parse(saved);
-        setCheckoutData(parsed);
-      } catch (err) {
-        setError('Invalid checkout data');
-        setLoading(false);
-      }
-    } else {
+    if (!saved) {
       setError('No checkout data found');
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch user data
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch('/api/users/aboutme', { method: 'POST' });
-        if (!res.ok) throw new Error('Failed to fetch user');
-        const data = await res.json();
-        setUser(data.data);
-      } catch (err) {
-        console.error('User fetch error:', err);
-        setUser(null);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  // Fetch flight details once checkoutData is loaded
-  useEffect(() => {
-    if (!checkoutData?.flightId) {
       setLoading(false);
       return;
     }
-
-    const fetchFlight = async () => {
-      try {
-        const res = await fetch(`/api/flights/${checkoutData.flightId}`);
-        if (!res.ok) throw new Error('Flight not found');
-        const data: Flight = await res.json();
-        setFlight(data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to load flight details.');
-      } finally {
-        setLoading(false);
+    try {
+      const parsed: CheckoutData = JSON.parse(saved);
+      if (!parsed.flightId || !Array.isArray(parsed.seats) || parsed.seats.length === 0 || !parsed.totalPrice) {
+        setError('Invalid checkout data');
+      } else {
+        setCheckoutData(parsed);
       }
-    };
+    } catch {
+      setError('Invalid checkout data');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    fetchFlight();
+  useEffect(() => {
+    if (!checkoutData) return;
+    fetch('/api/users/aboutme', { method: 'POST' })
+      .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch user'))
+      .then(data => setUser(data.data))
+      .catch(() => setUser(null));
   }, [checkoutData]);
 
-  // Handle confirm and payment
+  useEffect(() => {
+    if (!checkoutData?.flightId) return;
+    fetch(`/api/flights/${checkoutData.flightId}`)
+      .then(res => res.ok ? res.json() : Promise.reject('Flight not found'))
+      .then(data => setFlight(data))
+      .catch(() => setError('Failed to load flight details.'));
+  }, [checkoutData]);
+
   const handleConfirmPayment = async () => {
     if (!checkoutData || !flight) return;
-
     setLoading(true);
     setError(null);
-
     try {
-      const res = await fetch('/checkout', {  // Call the route as /checkout (not /checkout/api)
+      const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -113,29 +89,20 @@ export default function CheckoutPage() {
           paymentStatus: 'Paid',
           flightNumber: flight.flightNumber,
           totalPrice: checkoutData.totalPrice,
-          paymentMethod, // sending payment method if needed in future
+          paymentMethod,
         }),
       });
-
-      // Check response status and parse JSON only if correct content-type
       if (!res.ok) {
         let errMsg = 'Unknown error';
-        try {
-          const errorData = await res.json();
-          errMsg = errorData.error || errMsg;
-        } catch {
-          // fallback
-        }
-        alert('Failed to book seats: ' + errMsg);
+        try { const data = await res.json(); errMsg = data.error || errMsg; } catch {}
+        alert('Booking failed: ' + errMsg);
         setLoading(false);
         return;
       }
-
       alert('Payment confirmed and ticket created!');
       localStorage.removeItem('checkoutData');
       router.push('/confirmation');
-    } catch (err) {
-      console.error('Booking failed:', err);
+    } catch {
       alert('Booking failed. Please try again.');
       setLoading(false);
     }
@@ -143,72 +110,71 @@ export default function CheckoutPage() {
 
   if (loading) return <p className={styles.loading}>Loading checkout summary...</p>;
   if (error) return <p className={styles.error}>Error: {error}</p>;
-  if (!checkoutData || !flight) return <p className={styles.error}>Invalid data</p>;
+  if (!checkoutData || !flight) return null;
 
   return (
     <>
       <Header />
-
       <div className={styles.fullpage}>
         <div className={styles.container}>
-          <h1>Flight Ticket Summary</h1>
+          <h1 className={styles.title}>Flight Ticket Summary</h1>
 
           <div className={styles.section}>
-            <h2>Flight Information</h2>
-            <p>
-              <strong>Flight:</strong> {flight.flightNumber} ({flight.airline.name})
-            </p>
-            <p>
-              <strong>From:</strong> {flight.departureAirport.city} ({flight.departureAirport.name})
-            </p>
-            <p>
-              <strong>To:</strong> {flight.arrivalAirport.city} ({flight.arrivalAirport.name})
-            </p>
-            <p>
-              <strong>Departure:</strong> {new Date(flight.departureTime).toLocaleString()}
-            </p>
-            <p>
-              <strong>Arrival:</strong> {new Date(flight.arrivalTime).toLocaleString()}
-            </p>
-            <p>
-              <strong>Status:</strong> {flight.status}
-            </p>
+            <h2 className={styles.sectionTitle}>Flight Information</h2>
+            <table className={styles.flightTable}>
+              <tbody>
+                <tr>
+                  <td>Flight:</td>
+                  <td>{flight.flightNumber} ({flight.airline.name})</td>
+                </tr>
+                <tr>
+                  <td>From:</td>
+                  <td>{flight.departureAirport.city} ({flight.departureAirport.name})</td>
+                </tr>
+                <tr>
+                  <td>To:</td>
+                  <td>{flight.arrivalAirport.city} ({flight.arrivalAirport.name})</td>
+                </tr>
+                <tr>
+                  <td>Departure:</td>
+                  <td>{new Date(flight.departureTime).toLocaleString()}</td>
+                </tr>
+                <tr>
+                  <td>Arrival:</td>
+                  <td>{new Date(flight.arrivalTime).toLocaleString()}</td>
+                </tr>
+                <tr>
+                  <td>Status:</td>
+                  <td>{flight.status}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <div className={styles.section}>
-            <h2>Selected Seats</h2>
+            <h2 className={styles.sectionTitle}>Selected Seats</h2>
             <ul className={styles.seatsList}>
-              {checkoutData.seats.map((seat) => (
-                <li key={seat}>Seat: {seat}</li>
-              ))}
+              {checkoutData.seats.map(seat => <li key={seat}>Seat: {seat}</li>)}
             </ul>
-            <p className={styles.totalPrice}>
-              <strong>Total Price:</strong> ${checkoutData.totalPrice.toFixed(2)}
-            </p>
+            <p className={styles.totalPrice}><strong>Total Price:</strong> ${checkoutData.totalPrice.toFixed(2)}</p>
           </div>
 
           <div className={styles.section}>
-            <h2>User Information</h2>
+            <h2 className={styles.sectionTitle}>User Information</h2>
             {user ? (
               <>
-                <p>
-                  <strong>Username:</strong> {user.username}
-                </p>
-                <p>
-                  <strong>Email:</strong> {user.email}
-                </p>
+                <p><strong>Username:</strong> {user.username}</p>
+                <p><strong>Email:</strong> {user.email}</p>
               </>
-            ) : (
-              <p>Loading user info or user not authenticated.</p>
-            )}
+            ) : <p>Loading user info...</p>}
           </div>
 
           <div className={styles.section}>
-            <h2>Payment Method</h2>
+            <h2 className={styles.sectionTitle}>Payment Method</h2>
             <select
               className={styles.selectPayment}
               value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
+              onChange={e => setPaymentMethod(e.target.value)}
               disabled={loading}
             >
               <option value="credit_card">Credit Card</option>
@@ -221,13 +187,11 @@ export default function CheckoutPage() {
             className={styles.confirmBtn}
             onClick={handleConfirmPayment}
             disabled={loading}
-            aria-disabled={loading}
           >
             {loading ? 'Processing...' : 'Confirm & Pay'}
           </button>
         </div>
       </div>
-
       <Footer />
     </>
   );

@@ -1,7 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import { connect } from "@/dbConnection/dbConnection";
-import Flight from "@/models/flightModel";        
-import Booking from "@/models/reservationModel"; 
+import Flight from "@/models/flightModel";
+import Booking from "@/models/reservationModel";
+import Airport from "@/models/airportModel"; 
 import { getDataFromToken } from "@/helpers/getDataFromToken";
 
 connect();
@@ -9,14 +10,17 @@ connect();
 export async function GET(request: NextRequest) {
   try {
     const userId = getDataFromToken(request);
-    if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
     const bookings = await Booking.find({ user: userId })
       .populate({
         path: "flight",
+        model: Flight.modelName,
         populate: [
-          { path: "departureAirport", select: "name" },
-          { path: "arrivalAirport", select: "name" }
+          { path: "departureAirport", model: Airport.modelName, select: "name" },
+          { path: "arrivalAirport", model: Airport.modelName, select: "name" }
         ]
       })
       .sort({ bookingDate: -1 });
@@ -25,11 +29,13 @@ export async function GET(request: NextRequest) {
     const current = bookings
       .filter(b => b.flight && b.flight.departureTime > now)
       .map(b => b.flight);
+
     const previous = bookings
       .filter(b => b.flight && b.flight.departureTime <= now)
       .map(b => b.flight);
 
     return NextResponse.json({ current, previous }, { status: 200 });
+
   } catch (error: any) {
     console.error("Error fetching flights:", error);
     return NextResponse.json({ message: error.message || "Server error" }, { status: 500 });

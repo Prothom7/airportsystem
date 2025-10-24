@@ -214,3 +214,29 @@
   .flightInfo h3 { font-size: 1.1rem; }
   .logoutBtn { padding: 0.7rem 1.5rem; font-size: 0.95rem; }
 }
+
+.adminBtn {
+  background: #1e40af;
+  color: white;
+  font-weight: 700;
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.adminBtn:hover {
+  background: #1e3a8a;
+  transform: translateY(-2px);
+}
+
+.logoutWrapper {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;   
+  margin-top: 4rem;
+  margin-bottom: 2rem;
+  gap: 1rem; 
+}

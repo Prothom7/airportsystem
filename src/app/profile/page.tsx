@@ -62,6 +62,10 @@ export default function ProfilePage() {
     }
   };
 
+  const goToAdmin = () => {
+    router.push("/admin/dashboard");
+  };
+
   if (loading) {
     return (
       <div className={styles.loadingScreen}>
@@ -74,9 +78,8 @@ export default function ProfilePage() {
   return (
     <div className={styles.profileContainer}>
       <Header />
-
       <main className={styles.main}>
-        {/* Personal Info */}
+        {/* Personal Information Section */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2>Personal Information</h2>
@@ -112,26 +115,26 @@ export default function ProfilePage() {
           )}
         </section>
 
-        {/* Current Flights */}
+        {/* Current Flights Section */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2>Current Flights</h2>
           </div>
           {currentFlights.length > 0 ? (
             <ul className={styles.flightList}>
-              {currentFlights.map((flight) => (
-                <li key={flight._id} className={styles.flightCard}>
+              {currentFlights.map((flight, index) => (
+                <li key={`${flight._id}-${index}`} className={styles.flightCard}>
                   <div className={styles.flightInfo}>
                     <h3>{flight.flightNumber}</h3>
                     <p>
-                      {flight.departureAirport.name} →{" "}
-                      {flight.arrivalAirport.name}
+                      {flight.departureAirport.name} → {flight.arrivalAirport.name}
                     </p>
                     <p>
-                      Departure:{" "}
-                      {new Date(flight.departureTime).toLocaleString()}
+                      Departure: {new Date(flight.departureTime).toLocaleString()}
                     </p>
-                    <span className={`${styles.status} ${styles[flight.status.toLowerCase()]}`}>
+                    <span
+                      className={`${styles.status} ${styles[flight.status.toLowerCase()]}`}
+                    >
                       {flight.status}
                     </span>
                   </div>
@@ -143,26 +146,26 @@ export default function ProfilePage() {
           )}
         </section>
 
-        {/* Previous Flights */}
+        {/* Previous Flights Section */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2>Previous Flights</h2>
           </div>
           {previousFlights.length > 0 ? (
             <ul className={styles.flightList}>
-              {previousFlights.map((flight) => (
-                <li key={flight._id} className={styles.flightCard}>
+              {previousFlights.map((flight, index) => (
+                <li key={`${flight._id}-${index}`} className={styles.flightCard}>
                   <div className={styles.flightInfo}>
                     <h3>{flight.flightNumber}</h3>
                     <p>
-                      {flight.departureAirport.name} →{" "}
-                      {flight.arrivalAirport.name}
+                      {flight.departureAirport.name} → {flight.arrivalAirport.name}
                     </p>
                     <p>
-                      Departure:{" "}
-                      {new Date(flight.departureTime).toLocaleString()}
+                      Departure: {new Date(flight.departureTime).toLocaleString()}
                     </p>
-                    <span className={`${styles.status} ${styles[flight.status.toLowerCase()]}`}>
+                    <span
+                      className={`${styles.status} ${styles[flight.status.toLowerCase()]}`}
+                    >
                       {flight.status}
                     </span>
                   </div>
@@ -174,14 +177,18 @@ export default function ProfilePage() {
           )}
         </section>
 
-        {/* Logout */}
+        {/* Admin & Logout Buttons */}
         <div className={styles.logoutWrapper}>
+          {user?.isAdmin && (
+            <button onClick={goToAdmin} className={styles.adminBtn}>
+              Admin Dashboard
+            </button>
+          )}
           <button onClick={handleLogout} className={styles.logoutBtn}>
             Logout
           </button>
         </div>
       </main>
-
       <Footer />
     </div>
   );
