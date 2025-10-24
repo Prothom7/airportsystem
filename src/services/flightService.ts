@@ -16,11 +16,13 @@ export interface FlightType {
     inService: boolean;
   };
   airline: {
+    _id: string; // add _id here too
     name: string;
     code: string;
     country: string;
   };
   departureAirport: {
+    _id: string; // add _id
     name: string;
     city: string;
     country: string;
@@ -29,6 +31,7 @@ export interface FlightType {
     timezone: string;
   };
   arrivalAirport: {
+    _id: string; // add _id
     name: string;
     city: string;
     country: string;
@@ -41,6 +44,7 @@ export interface FlightType {
   status: string;
   price: number;
 }
+
 
 export async function getAllFlights(): Promise<FlightType[]> {
   await connect();

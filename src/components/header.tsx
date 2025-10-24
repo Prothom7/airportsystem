@@ -14,8 +14,8 @@ const Header: React.FC = () => {
             Flights
           </Link>
           <div className={styles.dropdownContent}>
-            <Link href="/flights/arrivals" className={styles.dropdownLink}>Arrivals</Link>
-            <Link href="/flights/departures" className={styles.dropdownLink}>Departures</Link>
+            <Link href="/flights/arrival" className={styles.dropdownLink}>Arrivals</Link>
+            <Link href="/flights/departure" className={styles.dropdownLink}>Departures</Link>
           </div>
         </div>
 
