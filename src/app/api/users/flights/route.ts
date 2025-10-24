@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { connect } from "@/dbConnection/dbConnection";
-import Flight from "@/models/flightModel";        // <-- FIRST
-import Booking from "@/models/reservationModel"; // <-- AFTER
+import Flight from "@/models/flightModel";        
+import Booking from "@/models/reservationModel"; 
 import { getDataFromToken } from "@/helpers/getDataFromToken";
 
 connect();

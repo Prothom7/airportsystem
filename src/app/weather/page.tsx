@@ -63,55 +63,55 @@ export default function WeatherPage() {
   };
 
   return (
-    <>
+    <div className={styles.fullpage}>
       <Header />
       <div className={styles.container}>
-        <h2 className={styles.title}>Current Weather & 5-Day Forecast</h2>
+        <div className={styles.mainCard}>
+          <h2 className={styles.title}>Current Weather & 5-Day Forecast</h2>
 
-        <form onSubmit={handleSearch} className={styles.searchForm}>
-          <input
-            type="text"
-            value={inputCity}
-            onChange={(e) => setInputCity(e.target.value)}
-            placeholder="Enter city name"
-            className={styles.searchInput}
-          />
-          <button type="submit" className={styles.searchButton}>Search</button>
-        </form>
+          <form onSubmit={handleSearch} className={styles.searchForm}>
+            <input
+              type="text"
+              value={inputCity}
+              onChange={(e) => setInputCity(e.target.value)}
+              placeholder="Enter city name"
+              className={styles.searchInput}
+            />
+            <button type="submit" className={styles.searchButton}>Search</button>
+          </form>
 
-        {loading && <p className={styles.loading}>Loading...</p>}
-        {error && <p className={styles.error}>{error}</p>}
+          {loading && <p className={styles.loading}>Loading...</p>}
+          {error && <p className={styles.error}>{error}</p>}
 
-        {forecast && forecast.list.length > 0 && (
-          <>
-            <div className={styles.current}>
-              <h3 className={styles.currentTitle}>Current Weather - {city}</h3>
-              <p><strong>Temperature:</strong> {forecast.list[0].main.temp.toFixed(1)}°C</p>
-              <p><strong>Humidity:</strong> {forecast.list[0].main.humidity}%</p>
-              <p><strong>Condition:</strong> {forecast.list[0].weather[0].description}</p>
-            </div>
-
-            <div className={styles.daily}>
-              <h3 className={styles.dailyTitle}>Next 5 Days Forecast</h3>
-              <div className={styles.cards}>
-                {dailyForecast.map((entry) => (
-                  <div key={entry.dt_txt} className={styles.weatherCard}>
-                    <div className={styles.weatherCardDay}>
-                      {getDayName(entry.dt_txt)}
-                    </div>
-                    <p><strong>Date:</strong> {entry.dt_txt.split(" ")[0]}</p>
-                    <p><strong>Temp:</strong> {entry.main.temp.toFixed(1)}°C</p>
-                    <p><strong>Humidity:</strong> {entry.main.humidity}%</p>
-                    <p><strong>Condition:</strong> {entry.weather[0].description}</p>
-                    <p><strong>Wind:</strong> {entry.wind.speed} m/s</p>
-                  </div>
-                ))}
+          {forecast && forecast.list.length > 0 && (
+            <>
+              <div className={styles.current}>
+                <h3 className={styles.currentTitle}>Current Weather - {city}</h3>
+                <p><strong>Temperature:</strong> {forecast.list[0].main.temp.toFixed(1)}°C</p>
+                <p><strong>Humidity:</strong> {forecast.list[0].main.humidity}%</p>
+                <p><strong>Condition:</strong> {forecast.list[0].weather[0].description}</p>
               </div>
-            </div>
-          </>
-        )}
+
+              <div className={styles.daily}>
+                <h3 className={styles.dailyTitle}>Next 5 Days Forecast</h3>
+                <div className={styles.cards}>
+                  {dailyForecast.map((entry) => (
+                    <div key={entry.dt_txt} className={styles.weatherCard}>
+                      <p className={styles.weatherCardDay}>{getDayName(entry.dt_txt)}</p>
+                      <p><strong>Date:</strong> {entry.dt_txt.split(" ")[0]}</p>
+                      <p><strong>Temp:</strong> {entry.main.temp.toFixed(1)}°C</p>
+                      <p><strong>Humidity:</strong> {entry.main.humidity}%</p>
+                      <p><strong>Condition:</strong> {entry.weather[0].description}</p>
+                      <p><strong>Wind:</strong> {entry.wind.speed} m/s</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 }
