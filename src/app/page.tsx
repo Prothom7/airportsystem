@@ -128,7 +128,7 @@ const Home = () => (
       <section className={styles.contact}>
         <h2>Contact Us</h2>
         <p>Have questions? We’re here to help. Reach out to us anytime.</p>
-        <a href="/contact" className={styles.ctaButton}>Get in Touch</a>
+        <a href="/contacts" className={styles.ctaButton}>Get in Touch</a>
       </section>
     </main>
 

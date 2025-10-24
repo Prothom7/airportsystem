@@ -1,0 +1,143 @@
+.container {
+  max-width: 900px;
+  margin: 120px auto 40px;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+}
+
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #111;
+}
+
+.searchForm {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.searchInput {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  width: 200px;
+}
+
+.searchButton {
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.searchButton:hover {
+  background-color: #2563eb;
+}
+
+.loading,
+.error {
+  text-align: center;
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.current {
+  text-align: center;
+  background-color: #f3f4f6;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.currentTitle {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.dailyTitle {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.weatherCard {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  width: 180px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.weatherCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.weatherCardDay {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #111;
+}
+
+.weatherCard p {
+  margin: 0.2rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.weatherCard strong {
+  color: #111;
+}
+
+@media (max-width: 768px) {
+  .cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .weatherCard {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .currentTitle,
+  .dailyTitle {
+    font-size: 1.5rem;
+  }
+}

@@ -10,7 +10,7 @@ const Header: React.FC = () => {
         <Link href="/" className={styles.navLink}>Home</Link>
 
         <div className={styles.dropdown}>
-          <Link href="/flights" className={styles.navLink}>
+          <Link href="/flights/search" className={styles.navLink}>
             Flights
           </Link>
           <div className={styles.dropdownContent}>
@@ -19,7 +19,7 @@ const Header: React.FC = () => {
           </div>
         </div>
 
-        <Link href="/book-flight" className={styles.navLink}>Book Flight</Link>
+        <Link href="/flights/search" className={styles.navLink}>Book Flight</Link>
 
         <div className={styles.dropdown}>
           <Link href="/services" className={styles.navLink}>
