@@ -97,31 +97,31 @@ export default function ContactPage() {
             <div className={styles.staffCards}>
               {/* Airport Director */}
               <div className={styles.staffCard}>
-                <img src="/images/director.jpg" alt="Airport Director" />
-                <h3>Jane Smith</h3>
+                <img src="/image/director.jpeg" alt="Airport Director" />
+                <h3>Md. Rubayet Nabil</h3>
                 <p>Airport Director</p>
                 <p>
-                  Jane oversees airport operations ensuring safety, compliance, and smooth operations.
+                  Rubayet oversees airport operations ensuring safety, compliance, and smooth operations.
                 </p>
               </div>
 
               {/* Air Traffic Controller */}
               <div className={styles.staffCard}>
-                <img src="/images/atc.jpg" alt="Air Traffic Controller" />
-                <h3>John Doe</h3>
+                <img src="/image/flight_controller.jpeg" alt="Air Traffic Controller" />
+                <h3>Sadid Siddique Farib</h3>
                 <p>Air Traffic Controller</p>
                 <p>
-                  John manages the airspace ensuring safe takeoffs, landings, and air traffic flow.
+                  Farib manages the airspace ensuring safe takeoffs, landings, and air traffic flow.
                 </p>
               </div>
 
               {/* Operations Manager */}
               <div className={styles.staffCard}>
-                <img src="/images/ops-manager.jpg" alt="Operations Manager" />
-                <h3>Mary Johnson</h3>
+                <img src="/image/operation.jpeg" alt="Operations Manager" />
+                <h3>Abdullah Al Mahmud</h3>
                 <p>Operations Manager</p>
                 <p>
-                  Mary coordinates all airport logistics including staffing, scheduling, and resources.
+                  Mahmud coordinates all airport logistics including staffing, scheduling, and resources.
                 </p>
               </div>
             </div>
