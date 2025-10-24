@@ -33,7 +33,7 @@ const Header: React.FC = () => {
         </div>
 
         <Link href="/profile" className={styles.navLink}>Profile</Link>
-        <Link href="/contact" className={styles.navLink}>Contact</Link>
+        <Link href="/contacts" className={styles.navLink}>Contact</Link>
       </nav>
     </header>
   );

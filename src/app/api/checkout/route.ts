@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    // Get user
     const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -30,7 +29,6 @@ export async function POST(req: NextRequest) {
 
     console.log("Booking for user:", user.email);
 
-    // Create bookings
     const bookings = await Promise.all(
       seats.map(seat =>
         Booking.create({
@@ -44,7 +42,6 @@ export async function POST(req: NextRequest) {
       )
     );
 
-    // Log before email
     console.log("Attempting to send confirmation email...");
 
     try {
@@ -55,14 +52,14 @@ export async function POST(req: NextRequest) {
         totalPrice
       );
 
-      console.log("✅ Email sent via nodemailer: ", emailResponse?.response || "Check Mailtrap");
+      console.log("Email sent via nodemailer: ", emailResponse?.response || "Check Mailtrap");
     } catch (emailErr: any) {
-      console.error("❌ Error sending email:", emailErr.message);
+      console.error("Error sending email:", emailErr.message);
     }
 
     return NextResponse.json({ message: "Tickets booked", bookings }, { status: 201 });
   } catch (err: any) {
-    console.error("❌ Booking error:", err.message);
+    console.error("Booking error:", err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
