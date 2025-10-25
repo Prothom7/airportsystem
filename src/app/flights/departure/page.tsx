@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import styles from './departure.module.css';
 
 interface Flight {
   _id: string;
@@ -38,33 +39,49 @@ export default function DepartureFlightsPage() {
     fetchFlights();
   }, []);
 
-  if (loading) return <p>Loading departure flights...</p>;
-
-  if (flights.length === 0) return <p>No flights departing today.</p>;
+  if (loading) return <p className={styles.loading}>Loading departure flights...</p>;
+  if (flights.length === 0) return <p className={styles.noFlights}>No flights departing today.</p>;
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Today's Departures</h1>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {flights.map(flight => (
-          <li
-            key={flight._id}
-            style={{
-              marginBottom: '1rem',
-              border: '1px solid #ddd',
-              padding: '1rem',
-              borderRadius: '8px'
-            }}
-          >
-            <h2>{flight.flightNumber}</h2>
-            <p><strong>Status:</strong> {flight.status}</p>
-            <p><strong>Airline:</strong> {flight.airline?.name || 'Unknown'}</p>
-            <p><strong>To:</strong> {flight.arrivalAirport?.name} ({flight.arrivalAirport?.city})</p>
-            <p><strong>Departure Time:</strong> {new Date(flight.departureTime).toLocaleString()}</p>
-            <p><strong>Price:</strong> ${flight.price}</p>
-          </li>
-        ))}
-      </ul>
+    <div className={styles.fullpage}>
+      <div className={styles.container}>
+        <h1 className={styles.heading}>Departure Flights</h1>
+        <div className={styles.tableWrapper}>
+          <table className={styles.flightTable}>
+            <thead>
+              <tr>
+                <th>Flight</th>
+                <th>Airline</th>
+                <th>To</th>
+                <th>Departure</th>
+                <th>Status</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {flights.map((flight) => (
+                <tr key={flight._id} className={styles.flightRow}>
+                  <td className={styles.flightNumber}>{flight.flightNumber}</td>
+                  <td>{flight.airline?.name || 'Unknown'}</td>
+                  <td>
+                    {flight.arrivalAirport?.name} ({flight.arrivalAirport?.city})
+                  </td>
+                  <td>
+                    {new Date(flight.departureTime).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </td>
+                  <td className={`${styles.status} ${styles[flight.status] || ''}`}>
+                    {flight.status}
+                  </td>
+                  <td>${flight.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
