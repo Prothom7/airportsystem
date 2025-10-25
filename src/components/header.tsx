@@ -28,7 +28,7 @@ const Header: React.FC = () => {
           <div className={styles.dropdownContent}>
             <Link href="/weather" className={styles.dropdownLink}>Weather</Link>
             <Link href="/services/online-checkin" className={styles.dropdownLink}>Online Check-in</Link>
-            <Link href="/services/parking" className={styles.dropdownLink}>Parking</Link>
+            <Link href="/taxi" className={styles.dropdownLink}>Taxi Booking</Link>
             <Link href="/services/lounge" className={styles.dropdownLink}>Lounges</Link>
           </div>
         </div>
