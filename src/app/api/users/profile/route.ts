@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDataFromToken } from "@/helpers/getDataFromToken";
 import User from "@/models/userModel";
+import Taxi from "@/models/taxiModel"; 
 import { connect } from "@/dbConnection/dbConnection"; 
 
 connect();
@@ -17,7 +18,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ user }, { status: 200 });
+    const taxiOrders = await Taxi.find({ user: userId });
+
+    return NextResponse.json({ user, taxiOrders }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
       { message: error.message || "Server error" },

@@ -75,13 +75,11 @@ const Home = () => (
     <main className={styles.mainContent}>
       <section className={styles.hero}>
         <div className={styles.heroText}>
-          <h1>Welcome to My Website</h1>
+          <h1>Welcome to Kuet Airport</h1>
           <p>Your gateway to world-class services and experiences.</p>
-          <button className={styles.ctaButton}>Explore Now</button>
         </div>
       </section>
 
-      {/* Services Section */}
       <section className={styles.services}>
         <h2>Our Services</h2>
         <div className={styles.serviceList}>
@@ -95,7 +93,6 @@ const Home = () => (
         </div>
       </section>
 
-      {/* Journey Planner Section */}
       <section className={styles.journeyPlanner}>
         <h2>Journey planner</h2>
         <div className={styles.cardList}>
@@ -110,7 +107,6 @@ const Home = () => (
         </div>
       </section>
 
-      {/* Customer Reviews Section */}
       <section className={styles.reviews}>
         <h2>What Our Customers Say</h2>
         <div className={styles.reviewList}>
@@ -124,7 +120,6 @@ const Home = () => (
         </div>
       </section>
 
-      {/* Contact Us Section */}
       <section className={styles.contact}>
         <h2>Contact Us</h2>
         <p>Have questions? We’re here to help. Reach out to us anytime.</p>
