@@ -22,9 +22,6 @@ export default function DashboardClient({ userName, flights }: Props) {
         <a className={styles.navItem} onClick={() => router.push('/admin/aircraft/new')}>
           Aircraft
         </a>
-        <a className={styles.navItem} onClick={() => router.push('/admin/user/new')}>
-          User
-        </a>
         <a className={styles.navItem} onClick={() => router.push('/admin/airline/new')}>
           Airline
         </a>
