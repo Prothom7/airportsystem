@@ -12,13 +12,13 @@ const services = [
   {
     title: 'Flight Information',
     description: 'Real-time updates and notifications for your flights.',
-    imgSrc: '/images/flight-information.jpg',
+    imgSrc: '/image/flights.jpg',
     imgAlt: 'Flight Information Board',
   },
   {
     title: 'Parking Solutions',
     description: 'Convenient parking options tailored to your travel needs.',
-    imgSrc: '/images/parking-solutions.jpg',
+    imgSrc: '/image/parking.jpeg',
     imgAlt: 'Parking Lot',
   },
 ];
@@ -28,43 +28,43 @@ const journeyCards = [
     title: 'Plan your journey',
     description: 'Find transport links and road routes to and from anywhere in the UK.',
     link: '/journey-planner',
-    imgSrc: '/images/journey-planner.jpg',
+    imgSrc: '/image/journey.png',
     imgAlt: 'Map and route planning',
   },
   {
     title: 'Transport options',
     description: 'Explore buses, trains, taxis, and more to get you to the airport.',
     link: '/transport-options',
-    imgSrc: '/images/transport-options.jpg',
+    imgSrc: '/image/taxi.jpg',
     imgAlt: 'Various transport modes',
   },
   {
     title: 'Road routes',
     description: 'Check the best road routes and traffic updates before you travel.',
     link: '/road-routes',
-    imgSrc: '/images/road-routes.jpg',
+    imgSrc: '/image/road.jpg',
     imgAlt: 'Road traffic and routes',
   },
 ];
 
 const reviews = [
   {
-    name: 'Alice Johnson',
+    name: 'Megha Tania',
     text: 'Excellent service, very smooth transfer experience!',
-    imgSrc: '/images/reviewers/alice.jpg',
-    imgAlt: 'Photo of Alice Johnson',
+    imgSrc: '/image/megha.jpeg',
+    imgAlt: 'Photo of Megha Tania',
   },
   {
-    name: 'Mark Lee',
+    name: 'Maruf Shafiq',
     text: 'Up-to-date flight info kept me on track — highly recommend.',
-    imgSrc: '/images/reviewers/mark.jpg',
-    imgAlt: 'Photo of Mark Lee',
+    imgSrc: '/image/maruf.jpeg',
+    imgAlt: 'Photo of Maruf Shafiq',
   },
   {
-    name: 'Sophia Patel',
+    name: 'Antu Chakma',
     text: 'The parking options are super convenient and affordable.',
-    imgSrc: '/images/reviewers/sophia.jpg',
-    imgAlt: 'Photo of Sophia Patel',
+    imgSrc: '/image/antu.jpeg',
+    imgAlt: 'Photo of Antu Chakma',
   },
 ];
 
