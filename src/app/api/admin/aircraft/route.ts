@@ -1,4 +1,3 @@
-// app/api/admin/aircraft/route.ts
 import { connect } from "@/dbConnection/dbConnection";
 import { getDataFromToken } from "@/helpers/getDataFromToken";
 import { NextRequest, NextResponse } from "next/server";
